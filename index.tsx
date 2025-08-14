@@ -116,9 +116,11 @@ const ZHUYIN_KEY_MAP: { [key: string]: string } = {
 };
 
 const difficulties = [
-  { name: "easy", speed: 2000, count: 1 },
-  { name: "medium", speed: 1500, count: 2 },
-  { name: "hard", speed: 1000, count: 3 },
+  { name: "Very Easy", speed: 2200, count: 1 },
+  { name: "Easy", speed: 1800, count: 1 },
+  { name: "Normal", speed: 1500, count: 2 },
+  { name: "Hard", speed: 1200, count: 2 },
+  { name: "Very Hard", speed: 1000, count: 3 },
 ];
 
 type LeaderboardEntry = { name: string, score: number, date: string };
@@ -168,6 +170,8 @@ const App = () => {
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch(e => console.error(`Error playing sound ${type}:`, e));
+    } else {
+      console.warn(`Sound ${type} not loaded or found.`);
     }
   }, []);
 
@@ -410,14 +414,14 @@ const App = () => {
           {mode && (
             <div className="mt-8 text-center">
               <h2 className="text-3xl font-bold mb-4 text-gray-800">Select Difficulty:</h2>
-              <div className="flex justify-center space-x-4">
+              <div className="flex justify-center space-x-4 flex-wrap gap-y-4">
                 {difficulties.map((level, i) => (
                   <Button
                     key={level.name}
                     className={`px-8 py-3 text-xl ${difficultyIndex === i ? 'bg-yellow-500 text-black' : 'bg-gray-700 hover:bg-gray-800'}`}
                     onClick={() => startGame(mode, i)}
                   >
-                    {level.name.toUpperCase()}
+                    {level.name}
                   </Button>
                 ))}
               </div>
