@@ -451,9 +451,14 @@ const App = () => {
 
 // --- Render App ---
 const container = document.getElementById('root');
-const root = ReactDOM.createRoot(container!);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+if (container) {
+  const root = ReactDOM.createRoot(container);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} else {
+    console.error("Root container missing. The application cannot be mounted.");
+}
+
