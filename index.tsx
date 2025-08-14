@@ -40,6 +40,69 @@ const FloatingText: React.FC<FloatingTextProps> = ({ x, y, value, onDisappear })
   );
 };
 
+
+// --- Keyboard Component ---
+
+const EN_LAYOUT = [
+  "1234567890-",
+  "QWERTYUIOP",
+  "ASDFGHJKL;",
+  "ZXCVBNM,./"
+];
+
+const ZH_LAYOUT = [
+  "ㄅㄉˇˋㄓˊ˙ㄚㄞㄢㄦ",
+  "ㄆㄊㄍㄎㄐㄔㄗㄧㄛㄟㄣ",
+  "ㄇㄋㄏㄑㄕㄘㄨㄜㄠㄤ",
+  "ㄈㄌㄒㄖㄙㄩㄝㄡㄥ"
+];
+
+const ZHUYIN_REVERSE_MAP = {
+    '1': 'ㄅ', 'Q': 'ㄆ', 'A': 'ㄇ', 'Z': 'ㄈ', '2': 'ㄉ',
+    'W': 'ㄊ', 'S': 'ㄋ', 'X': 'ㄌ', 'E': 'ㄍ', 'D': 'ㄎ',
+    'C': 'ㄏ', 'R': 'ㄐ', 'F': 'ㄑ', 'V': 'ㄒ', '5': 'ㄓ',
+    'T': 'ㄔ', 'G': 'ㄕ', 'B': 'ㄖ', 'Y': 'ㄗ', 'H': 'ㄘ',
+    'N': 'ㄙ', 'U': 'ㄧ', 'J': 'ㄨ', 'M': 'ㄩ', '8': 'ㄚ',
+    'I': 'ㄛ', 'K': 'ㄜ', ',': 'ㄝ', '9': 'ㄞ', 'O': 'ㄟ',
+    'L': 'ㄠ', '.': 'ㄡ', '0': 'ㄢ', 'P': 'ㄣ', ';': 'ㄤ',
+    '/': 'ㄥ', '-': 'ㄦ'
+};
+
+
+interface KeyboardProps {
+    activeKeys: Set<string>;
+    mode: 'en' | 'zh';
+}
+
+const Keyboard: React.FC<KeyboardProps> = ({ activeKeys, mode }) => {
+    const layout = mode === 'zh' ? ZH_LAYOUT : EN_LAYOUT;
+
+    return (
+        <div className="keyboard">
+            {layout.map((row, rowIndex) => (
+                <div key={rowIndex} className="keyboard-row">
+                    {row.split('').map((key) => {
+                        let isActive = false;
+                        if (mode === 'zh') {
+                            const zhChar = ZHUYIN_REVERSE_MAP[key.toUpperCase() as keyof typeof ZHUYIN_REVERSE_MAP];
+                            isActive = activeKeys.has(zhChar);
+                        } else {
+                            isActive = activeKeys.has(key.toUpperCase());
+                        }
+
+                        return (
+                            <div key={key} className={`keyboard-key ${isActive ? 'highlight' : ''}`}>
+                                {key}
+                            </div>
+                        );
+                    })}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+
 // --- Game Constants ---
 
 const CHAR_SETS = {
@@ -311,6 +374,19 @@ const App = () => {
         }
     }
   }, [bombsCleared, difficultyIndex]);
+  
+  // Calculate active keys for the keyboard
+  const activeKeys = new Set<string>();
+  if (step === 'game') {
+      bombs.forEach(bomb => {
+          if (mode === 'en') {
+              activeKeys.add(bomb.char.toUpperCase());
+          } else if (mode === 'zh') {
+              activeKeys.add(bomb.char);
+          }
+      });
+  }
+
 
   const startGame = (selectedMode: string, difficultyIdx: number) => {
     setMode(selectedMode);
@@ -443,6 +519,11 @@ const App = () => {
           <div className="mt-8 text-center text-gray-800 text-xl font-medium">
             <p>Difficulty: <span className="font-bold capitalize text-green-700">{currentDifficulty.name}</span></p>
           </div>
+          
+          {/* --- Render Keyboard --- */}
+          <div className="mt-6">
+              {mode && <Keyboard activeKeys={activeKeys} mode={mode as 'en' | 'zh'} />}
+          </div>
         </>
       )}
     </div>
@@ -461,4 +542,3 @@ if (container) {
 } else {
     console.error("Root container missing. The application cannot be mounted.");
 }
-

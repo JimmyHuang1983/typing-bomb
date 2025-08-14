@@ -20,3 +20,48 @@ body {
 .animate-float-up {
   animation: float-up-fade-out 1s ease-out forwards;
 }
+
+/* --- Keyboard Styles --- */
+
+.keyboard {
+  margin-top: 20px;
+  background-color: #d1d5db; /* bg-gray-300 */
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* space between rows */
+  width: fit-content;
+  max-width: 100%;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px; /* space between keys */
+}
+
+.keyboard-key {
+  background-color: #f9fafb; /* bg-gray-50 */
+  color: #1f2937; /* text-gray-800 */
+  border: 1px solid #9ca3af; /* border-gray-400 */
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+}
+
+.keyboard-key.highlight {
+  background-color: #facc15; /* bg-yellow-400 */
+  color: #1f2937; /* text-gray-800 */
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #facc15;
+}
