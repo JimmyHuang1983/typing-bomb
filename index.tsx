@@ -43,30 +43,28 @@ const FloatingText: React.FC<FloatingTextProps> = ({ x, y, value, onDisappear })
 
 // --- Keyboard Component ---
 
-const EN_LAYOUT = [
-  "1234567890-",
-  "QWERTYUIOP",
-  "ASDFGHJKL;",
-  "ZXCVBNM,./"
+const KEYBOARD_LAYOUT = [
+    [
+        { key: '`', zh: '`' }, { key: '1', zh: 'ㄅ' }, { key: '2', zh: 'ㄉ' }, { key: '3', zh: 'ˇ' },
+        { key: '4', zh: 'ˋ' }, { key: '5', zh: 'ㄓ' }, { key: '6', zh: 'ˊ' }, { key: '7', zh: '˙' },
+        { key: '8', zh: 'ㄚ' }, { key: '9', zh: 'ㄞ' }, { key: '0', zh: 'ㄢ' }, { key: '-', zh: 'ㄦ' }, { key: '=', zh: '=' }
+    ],
+    [
+        { key: 'Q', zh: 'ㄆ' }, { key: 'W', zh: 'ㄊ' }, { key: 'E', zh: 'ㄍ' }, { key: 'R', zh: 'ㄐ' },
+        { key: 'T', zh: 'ㄔ' }, { key: 'Y', zh: 'ㄗ' }, { key: 'U', zh: 'ㄧ' }, { key: 'I', zh: 'ㄛ' },
+        { key: 'O', zh: 'ㄟ' }, { key: 'P', zh: 'ㄣ' }, { key: '[', zh: '[' }, { key: ']', zh: ']' }
+    ],
+    [
+        { key: 'A', zh: 'ㄇ' }, { key: 'S', zh: 'ㄋ' }, { key: 'D', zh: 'ㄎ' }, { key: 'F', zh: 'ㄑ' },
+        { key: 'G', zh: 'ㄕ' }, { key: 'H', zh: 'ㄘ' }, { key: 'J', zh: 'ㄨ' }, { key: 'K', zh: 'ㄜ' },
+        { key: 'L', zh: 'ㄠ' }, { key: ';', zh: 'ㄤ' }, { key: "'", zh: "'" }
+    ],
+    [
+        { key: 'Z', zh: 'ㄈ' }, { key: 'X', zh: 'ㄌ' }, { key: 'C', zh: 'ㄏ' }, { key: 'V', zh: 'ㄒ' },
+        { key: 'B', zh: 'ㄖ' }, { key: 'N', zh: 'ㄙ' }, { key: 'M', zh: 'ㄩ' }, { key: ',', zh: 'ㄝ' },
+        { key: '.', zh: 'ㄡ' }, { key: '/', zh: 'ㄥ' }
+    ]
 ];
-
-const ZH_LAYOUT = [
-  "ㄅㄉˇˋㄓˊ˙ㄚㄞㄢㄦ",
-  "ㄆㄊㄍㄎㄐㄔㄗㄧㄛㄟㄣ",
-  "ㄇㄋㄏㄑㄕㄘㄨㄜㄠㄤ",
-  "ㄈㄌㄒㄖㄙㄩㄝㄡㄥ"
-];
-
-const ZHUYIN_REVERSE_MAP = {
-    '1': 'ㄅ', 'Q': 'ㄆ', 'A': 'ㄇ', 'Z': 'ㄈ', '2': 'ㄉ',
-    'W': 'ㄊ', 'S': 'ㄋ', 'X': 'ㄌ', 'E': 'ㄍ', 'D': 'ㄎ',
-    'C': 'ㄏ', 'R': 'ㄐ', 'F': 'ㄑ', 'V': 'ㄒ', '5': 'ㄓ',
-    'T': 'ㄔ', 'G': 'ㄕ', 'B': 'ㄖ', 'Y': 'ㄗ', 'H': 'ㄘ',
-    'N': 'ㄙ', 'U': 'ㄧ', 'J': 'ㄨ', 'M': 'ㄩ', '8': 'ㄚ',
-    'I': 'ㄛ', 'K': 'ㄜ', ',': 'ㄝ', '9': 'ㄞ', 'O': 'ㄟ',
-    'L': 'ㄠ', '.': 'ㄡ', '0': 'ㄢ', 'P': 'ㄣ', ';': 'ㄤ',
-    '/': 'ㄥ', '-': 'ㄦ'
-};
 
 
 interface KeyboardProps {
@@ -75,24 +73,19 @@ interface KeyboardProps {
 }
 
 const Keyboard: React.FC<KeyboardProps> = ({ activeKeys, mode }) => {
-    const layout = mode === 'zh' ? ZH_LAYOUT : EN_LAYOUT;
-
     return (
         <div className="keyboard">
-            {layout.map((row, rowIndex) => (
+            {KEYBOARD_LAYOUT.map((row, rowIndex) => (
                 <div key={rowIndex} className="keyboard-row">
-                    {row.split('').map((key) => {
-                        let isActive = false;
-                        if (mode === 'zh') {
-                            const zhChar = ZHUYIN_REVERSE_MAP[key.toUpperCase() as keyof typeof ZHUYIN_REVERSE_MAP];
-                            isActive = activeKeys.has(zhChar);
-                        } else {
-                            isActive = activeKeys.has(key.toUpperCase());
-                        }
+                    {row.map(({ key, zh }) => {
+                        const isActive = mode === 'en'
+                            ? activeKeys.has(key.toUpperCase())
+                            : activeKeys.has(zh);
 
                         return (
                             <div key={key} className={`keyboard-key ${isActive ? 'highlight' : ''}`}>
-                                {key}
+                                {mode === 'zh' && <span className="zh-char">{zh}</span>}
+                                <span className="en-char">{key}</span>
                             </div>
                         );
                     })}
@@ -106,11 +99,11 @@ const Keyboard: React.FC<KeyboardProps> = ({ activeKeys, mode }) => {
 // --- Game Constants ---
 
 const CHAR_SETS = {
-  en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ135790",
+  en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
   zh: "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ"
 };
 
-const ZHUYIN_KEY_MAP = {
+const ZHUYIN_KEY_MAP: { [key: string]: string } = {
   'ㄅ': '1', 'ㄆ': 'Q', 'ㄇ': 'A', 'ㄈ': 'Z', 'ㄉ': '2',
   'ㄊ': 'W', 'ㄋ': 'S', 'ㄌ': 'X', 'ㄍ': 'E', 'ㄎ': 'D',
   'ㄏ': 'C', 'ㄐ': 'R', 'ㄑ': 'F', 'ㄒ': 'V', 'ㄓ': '5',
@@ -119,6 +112,7 @@ const ZHUYIN_KEY_MAP = {
   'ㄛ': 'I', 'ㄜ': 'K', 'ㄝ': ',', 'ㄞ': '9', 'ㄟ': 'O',
   'ㄠ': 'L', 'ㄡ': '.', 'ㄢ': '0', 'ㄣ': 'P', 'ㄤ': ';',
   'ㄥ': '/', 'ㄦ': '-',
+  'ˇ': '3', 'ˋ': '4', 'ˊ': '6', '˙': '7'
 };
 
 const difficulties = [
@@ -127,10 +121,12 @@ const difficulties = [
   { name: "hard", speed: 1000, count: 3 },
 ];
 
+type LeaderboardEntry = { name: string, score: number, date: string };
+
 // --- Main App Component ---
 
 const App = () => {
-  const [mode, setMode] = useState<string | null>(null);
+  const [mode, setMode] = useState<'en' | 'zh' | null>(null);
   const [difficultyIndex, setDifficultyIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(10);
@@ -139,7 +135,8 @@ const App = () => {
   const [step, setStep] = useState("select-mode");
   const [username, setUsername] = useState("");
   const [bombsCleared, setBombsCleared] = useState(0);
-  const [leaderboard, setLeaderboard] = useState<{name: string, score: number, date: string}[]>([]);
+  const [leaderboards, setLeaderboards] = useState<{ [key: string]: LeaderboardEntry[] }>({ en: [], zh: [] });
+  const [viewingLeaderboard, setViewingLeaderboard] = useState<'en' | 'zh' | null>(null);
   const [floatingTexts, setFloatingTexts] = useState<{id: number, x: number, y: number, value: string}[]>([]);
 
   const bombIdRef = useRef(0);
@@ -151,7 +148,6 @@ const App = () => {
   const bombsToNextLevel = 50;
 
   const loadSounds = useCallback(() => {
-    // Using free, publicly available sounds
     const sounds = {
       hit: "https://actions.google.com/sounds/v1/impacts/kick.ogg",
       fail: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg",
@@ -172,21 +168,19 @@ const App = () => {
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch(e => console.error(`Error playing sound ${type}:`, e));
-    } else {
-      console.warn(`Sound ${type} not loaded or found.`);
     }
   }, []);
 
   useEffect(() => {
     loadSounds();
-    const stored = localStorage.getItem("leaderboard");
-    if (stored) {
-      try {
-        setLeaderboard(JSON.parse(stored));
-      } catch (e) {
-        console.error("Failed to parse leaderboard from localStorage", e);
-        localStorage.removeItem("leaderboard");
-      }
+    try {
+        const enBoard = JSON.parse(localStorage.getItem("leaderboard_en") || "[]");
+        const zhBoard = JSON.parse(localStorage.getItem("leaderboard_zh") || "[]");
+        setLeaderboards({ en: enBoard, zh: zhBoard });
+    } catch (e) {
+        console.error("Failed to parse leaderboards from localStorage", e);
+        localStorage.removeItem("leaderboard_en");
+        localStorage.removeItem("leaderboard_zh");
     }
   }, [loadSounds]);
 
@@ -196,7 +190,8 @@ const App = () => {
 
     setBombs((prev) => {
       let newBombsBatch: { id: number; char: string; x: number; y: number; }[] = [];
-      const currentChars = CHAR_SETS[mode as keyof typeof CHAR_SETS];
+      if (!mode) return prev;
+      const currentChars = CHAR_SETS[mode];
 
       if (!currentChars || currentChars.length === 0) {
           return prev;
@@ -207,24 +202,21 @@ const App = () => {
         let overlapped;
         let attempts = 0;
         const maxAttempts = 50;
-
         do {
           overlapped = false;
           newX = Math.random() * (canvasWidth - bombRadius * 2) + bombRadius;
-
           const allBombs = [...prev, ...newBombsBatch];
           for (const existingBomb of allBombs) {
             const dx = newX - existingBomb.x;
-            const dy = 0 - existingBomb.y; // New bombs are at y=0
+            const dy = 0 - existingBomb.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < bombRadius * 2.5) { // Increased distance slightly
+            if (distance < bombRadius * 2.5) {
               overlapped = true;
               break;
             }
           }
           attempts++;
         } while (overlapped && attempts < maxAttempts);
-
         if (!overlapped) {
           newBombsBatch.push({
             id: bombIdRef.current++,
@@ -259,16 +251,13 @@ const App = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (step !== "game" || gameOver) return;
-
+      if (step !== "game" || gameOver || !mode) return;
       const inputKey = e.key.toUpperCase();
-
       setBombs((prev) => {
         let hitOccurred = false;
         const updatedBombs = prev.filter((b) => {
           let charOnBomb = b.char;
           let match = false;
-          
           if (mode === 'zh') {
             const expectedKey = ZHUYIN_KEY_MAP[charOnBomb as keyof typeof ZHUYIN_KEY_MAP];
             if (expectedKey && inputKey === expectedKey.toUpperCase()) {
@@ -279,7 +268,6 @@ const App = () => {
               match = true;
             }
           }
-          
           if (match && !hitOccurred) {
             setScore((s) => s + 1);
             setBombsCleared((n) => n + 1);
@@ -289,15 +277,13 @@ const App = () => {
               { id: floatingTextIdRef.current++, x: b.x, y: b.y, value: "+1" }
             ]);
             hitOccurred = true;
-            return false; // Remove bomb
+            return false;
           }
-          
-          return true; // Keep bomb
+          return true;
         });
         return updatedBombs;
       });
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [step, gameOver, mode, playSound, handleDisappear]);
@@ -305,7 +291,6 @@ const App = () => {
   useEffect(() => {
     const checkInterval = setInterval(() => {
       if(step !== "game" || gameOver) return;
-      
       setBombs((prev) => {
         const stillActive: { id: number; char: string; x: number; y: number; }[] = [];
         let livesLost = 0;
@@ -316,7 +301,6 @@ const App = () => {
             stillActive.push(b);
           }
         });
-
         if (livesLost > 0) {
             setLives((l) => Math.max(0, l - livesLost));
             playSound("fail");
@@ -324,7 +308,6 @@ const App = () => {
         return stillActive;
       });
     }, 100);
-
     return () => clearInterval(checkInterval);
   }, [step, gameOver, playSound]);
 
@@ -341,23 +324,18 @@ const App = () => {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     bombs.forEach((b) => {
       ctx.fillStyle = "black";
       ctx.beginPath();
       ctx.arc(b.x, b.y, 20, 0, Math.PI * 2);
       ctx.fill();
-
       ctx.fillStyle = "gray";
       ctx.fillRect(b.x - 2, b.y - 25, 4, 10);
-
       ctx.fillStyle = "red";
       ctx.beginPath();
       ctx.arc(b.x, b.y - 25, 4, 0, Math.PI * 2);
       ctx.fill();
-
       ctx.fillStyle = "white";
       ctx.font = "bold 24px Arial";
       ctx.textAlign = "center";
@@ -375,9 +353,8 @@ const App = () => {
     }
   }, [bombsCleared, difficultyIndex]);
   
-  // Calculate active keys for the keyboard
   const activeKeys = new Set<string>();
-  if (step === 'game') {
+  if (step === 'game' && mode) {
       bombs.forEach(bomb => {
           if (mode === 'en') {
               activeKeys.add(bomb.char.toUpperCase());
@@ -387,8 +364,7 @@ const App = () => {
       });
   }
 
-
-  const startGame = (selectedMode: string, difficultyIdx: number) => {
+  const startGame = (selectedMode: 'en' | 'zh', difficultyIdx: number) => {
     setMode(selectedMode);
     setDifficultyIndex(difficultyIdx);
     setScore(0);
@@ -401,10 +377,15 @@ const App = () => {
   };
 
   const submitScore = () => {
+    if (!mode) return;
     const newEntry = { name: username || "Anonymous", score, date: new Date().toLocaleString() };
-    const newBoard = [...leaderboard, newEntry].sort((a, b) => b.score - a.score).slice(0, 10);
-    setLeaderboard(newBoard);
-    localStorage.setItem("leaderboard", JSON.stringify(newBoard));
+    const currentBoard = leaderboards[mode] || [];
+    const newBoard = [...currentBoard, newEntry].sort((a, b) => b.score - a.score).slice(0, 10);
+    
+    setLeaderboards(prev => ({ ...prev, [mode]: newBoard }));
+    localStorage.setItem(`leaderboard_${mode}`, JSON.stringify(newBoard));
+    
+    setViewingLeaderboard(mode);
     setStep("leaderboard");
   };
   
@@ -413,6 +394,8 @@ const App = () => {
     setStep("select-mode");
     setDifficultyIndex(0);
   }
+
+  const currentBoard = viewingLeaderboard ? leaderboards[viewingLeaderboard] : [];
 
   return (
     <div className="p-4 relative min-h-screen flex flex-col items-center justify-start bg-gray-50 font-sans">
@@ -424,7 +407,6 @@ const App = () => {
             <Button className="px-10 py-4 text-2xl bg-green-500 hover:bg-green-600 shadow-lg" onClick={() => setMode("en")}>English Mode</Button>
             <Button className="px-10 py-4 text-2xl bg-purple-500 hover:bg-purple-600 shadow-lg" onClick={() => setMode("zh")}>Zhuyin Mode</Button>
           </div>
-
           {mode && (
             <div className="mt-8 text-center">
               <h2 className="text-3xl font-bold mb-4 text-gray-800">Select Difficulty:</h2>
@@ -463,11 +445,25 @@ const App = () => {
       {step === "leaderboard" && (
         <div className="p-4 text-center min-h-screen flex flex-col justify-center items-center">
           <h1 className="text-4xl font-extrabold text-yellow-700 mb-6">🏆 Leaderboard 🏆</h1>
-          {leaderboard.length === 0 ? (
-            <p className="text-xl text-gray-600">No scores yet. Be the first!</p>
+          
+          <div className="mb-4 flex space-x-4">
+            <Button 
+                className={viewingLeaderboard === 'en' ? 'bg-green-600' : 'bg-gray-500'}
+                onClick={() => setViewingLeaderboard('en')}>
+                English
+            </Button>
+            <Button 
+                className={viewingLeaderboard === 'zh' ? 'bg-purple-600' : 'bg-gray-500'}
+                onClick={() => setViewingLeaderboard('zh')}>
+                Zhuyin
+            </Button>
+          </div>
+
+          {currentBoard.length === 0 ? (
+            <p className="text-xl text-gray-600 mt-4">No scores yet. Be the first!</p>
           ) : (
             <ol className="mb-8 list-decimal list-inside text-xl font-medium max-w-lg mx-auto bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-              {leaderboard.map((entry, i) => (
+              {currentBoard.map((entry, i) => (
                 <li key={i} className="mb-3 flex justify-between items-center border-b pb-2 last:border-b-0 last:pb-0">
                   <span className="text-gray-800">{i + 1}. <span className="font-semibold">{entry.name}</span></span>
                   <span className="font-extrabold text-blue-700 text-2xl">
@@ -477,7 +473,7 @@ const App = () => {
               ))}
             </ol>
           )}
-          <Button className="px-10 py-4 text-xl bg-green-600 hover:bg-green-700 shadow-lg" onClick={resetGame}>Play Again</Button>
+          <Button className="px-10 py-4 text-xl bg-blue-600 hover:bg-blue-700 shadow-lg" onClick={resetGame}>Play Again</Button>
         </div>
       )}
 
@@ -487,42 +483,25 @@ const App = () => {
             <div className="flex items-center text-red-600 font-extrabold text-4xl select-none">
               <span role="img" aria-label="heart" className="mr-2 text-5xl animate-pulse">❤️</span> {lives}
             </div>
-
             <div className="flex flex-col items-center text-blue-600 font-extrabold text-4xl select-none">
               <span role="img" aria-label="trophy" className="mb-1 text-5xl">🏆</span> {score}
             </div>
-
             <div className="flex flex-col items-center text-green-700 font-extrabold text-3xl select-none">
               <span className="text-sm">Next Level</span>
               <span className="text-4xl">{bombsToNextLevel - (bombsCleared % bombsToNextLevel)}</span>
             </div>
           </div>
-
           <div className="relative w-[400px] h-[500px] mx-auto block">
-            <canvas
-              ref={canvasRef}
-              width={400}
-              height={500}
-              className="bg-gray-900 border-4 border-gray-700 rounded-lg shadow-2xl"
-            />
+            <canvas ref={canvasRef} width={400} height={500} className="bg-gray-900 border-4 border-gray-700 rounded-lg shadow-2xl" />
             {floatingTexts.map((text) => (
-              <FloatingText
-                key={text.id}
-                x={text.x}
-                y={text.y}
-                value={text.value}
-                onDisappear={() => handleDisappear(text.id)}
-              />
+              <FloatingText key={text.id} x={text.x} y={text.y} value={text.value} onDisappear={() => handleDisappear(text.id)} />
             ))}
           </div>
-
           <div className="mt-8 text-center text-gray-800 text-xl font-medium">
             <p>Difficulty: <span className="font-bold capitalize text-green-700">{currentDifficulty.name}</span></p>
           </div>
-          
-          {/* --- Render Keyboard --- */}
           <div className="mt-6">
-              {mode && <Keyboard activeKeys={activeKeys} mode={mode as 'en' | 'zh'} />}
+              {mode && <Keyboard activeKeys={activeKeys} mode={mode} />}
           </div>
         </>
       )}
